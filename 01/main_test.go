@@ -12,3 +12,17 @@ treb7uchet`
 		t.Errorf("Expected 142 got %v", res)
 	}
 }
+
+func TestJustStraightMessMeUp(t *testing.T) {
+	testInput := `two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen`
+	res := getConfigurationValue(testInput)
+	if res != 281 {
+		t.Errorf("Expected 281 got %v", res)
+	}
+}
