@@ -40,3 +40,59 @@ func TestParsingOfGrid(t *testing.T) {
 		t.Errorf("Expected 4,6 got %v", symbols[2].Location)
 	}
 }
+
+func TestGetTotalAdjacentToSymbols(t *testing.T) {
+	grid := `467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..`
+	values, symbols := ParseGridToEntities(grid, '.')
+
+	res := GetSumAdjacentToSymbols(values, symbols)
+
+	if res != 4361 {
+
+		t.Errorf("Expected 4361 got %v", res)
+	}
+}
+
+func TestAdjacencyCode(t *testing.T) {
+	loc := Location{X: 4, Y: 7}
+	if !loc.IsAdjacent(Location{X: 3, Y: 8}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 3, Y: 7}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 3, Y: 6}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 4, Y: 8}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 4, Y: 6}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 5, Y: 8}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 5, Y: 7}) {
+		t.Error("Expected adjacent")
+	}
+	if !loc.IsAdjacent(Location{X: 5, Y: 6}) {
+		t.Error("Expected adjacent")
+	}
+
+	if loc.IsAdjacent(Location{X: 4, Y: 7}) {
+		t.Error("Expected not adjacent")
+	}
+	if loc.IsAdjacent(Location{X: 12, Y: 10}) {
+		t.Error("Expected not adjacent")
+	}
+}

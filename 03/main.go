@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -22,8 +23,38 @@ type Location struct {
 	Y int
 }
 
-func myTestFunction() int {
-	return 1
+func (lc Location) IsSame(other Location) bool {
+	return lc.X == other.X && lc.Y == other.Y
+}
+
+func (lc Location) IsAdjacent(other Location) bool {
+	adjacents := []Location{
+		{X: other.X - 1, Y: other.Y - 1},
+		{X: other.X + 1, Y: other.Y + 1},
+		{X: other.X - 1, Y: other.Y + 1},
+		{X: other.X + 1, Y: other.Y - 1},
+		{X: other.X - 1, Y: other.Y},
+		{X: other.X, Y: other.Y - 1},
+		{X: other.X + 1, Y: other.Y},
+		{X: other.X, Y: other.Y + 1},
+	}
+	for _, adj := range adjacents {
+		if adj.IsSame(lc) {
+			return true
+		}
+	}
+	return false
+}
+
+func (val ValueLocation) AdjacentToSymbol(symbols []SymbolLocation) bool {
+	for _, vl := range val.Locations {
+		for _, sbl := range symbols {
+			if vl.IsAdjacent(sbl.Location) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func ParseGridToEntities(data string, spacerSymbol rune) ([]ValueLocation, []SymbolLocation) {
@@ -36,18 +67,8 @@ func ParseGridToEntities(data string, spacerSymbol rune) ([]ValueLocation, []Sym
 	numbuffloc := []Location{}
 
 	for y, line := range lines {
-		if y == 0 && len(numbuff) > 0 {
-			// "purge" the buffer
-			val, _ := strconv.Atoi(numbuff)
-			values = append(values, ValueLocation{
-				Value:     val,
-				Locations: numbuffloc,
-			})
-			numbuff = ""
-			numbuffloc = []Location{}
-		}
 		for x, char := range line {
-			if char == spacerSymbol && len(numbuff) > 0 {
+			if (x == 0 || !unicode.IsNumber(char)) && len(numbuff) > 0 {
 				// "purge" the buffer
 				val, _ := strconv.Atoi(numbuff)
 				values = append(values, ValueLocation{
@@ -75,9 +96,21 @@ func ParseGridToEntities(data string, spacerSymbol rune) ([]ValueLocation, []Sym
 	return values, symbols
 }
 
-func main() {
-	//buf, _ := os.ReadFile("data.txt")
-	//stringput := string(buf)
+func GetSumAdjacentToSymbols(values []ValueLocation, symbols []SymbolLocation) int {
+	cml := 0
+	for _, value := range values {
+		if value.AdjacentToSymbol(symbols) {
+			cml = cml + value.Value
+		}
+	}
+	return cml
+}
 
-	fmt.Printf("Result: %v", myTestFunction())
+func main() {
+	buf, _ := os.ReadFile("data.txt")
+	stringput := string(buf)
+
+	val, sym := ParseGridToEntities(stringput, '.')
+
+	fmt.Println("Result: ", GetSumAdjacentToSymbols(val, sym))
 }
