@@ -62,6 +62,27 @@ func TestGetTotalAdjacentToSymbols(t *testing.T) {
 	}
 }
 
+func TestGetSumOfGearRatios(t *testing.T) {
+	grid := `467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..`
+	values, symbols := ParseGridToEntities(grid, '.')
+
+	res := GetSumOfGearRatios(values, symbols)
+
+	if res != 467835 {
+
+		t.Errorf("Expected 467835 got %v", res)
+	}
+}
+
 func TestAdjacencyCode(t *testing.T) {
 	loc := Location{X: 4, Y: 7}
 	if !loc.IsAdjacent(Location{X: 3, Y: 8}) {

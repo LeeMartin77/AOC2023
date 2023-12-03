@@ -46,15 +46,15 @@ func (lc Location) IsAdjacent(other Location) bool {
 	return false
 }
 
-func (val ValueLocation) AdjacentToSymbol(symbols []SymbolLocation) bool {
+func (val ValueLocation) AdjacentToSymbol(symbols []SymbolLocation) (bool, int) {
 	for _, vl := range val.Locations {
-		for _, sbl := range symbols {
+		for i, sbl := range symbols {
 			if vl.IsAdjacent(sbl.Location) {
-				return true
+				return true, i
 			}
 		}
 	}
-	return false
+	return false, -1
 }
 
 func ParseGridToEntities(data string, spacerSymbol rune) ([]ValueLocation, []SymbolLocation) {
@@ -99,10 +99,40 @@ func ParseGridToEntities(data string, spacerSymbol rune) ([]ValueLocation, []Sym
 func GetSumAdjacentToSymbols(values []ValueLocation, symbols []SymbolLocation) int {
 	cml := 0
 	for _, value := range values {
-		if value.AdjacentToSymbol(symbols) {
+		yes, _ := value.AdjacentToSymbol(symbols)
+		if yes {
 			cml = cml + value.Value
 		}
 	}
+	return cml
+}
+
+func GetSumOfGearRatios(values []ValueLocation, symbols []SymbolLocation) int {
+	cml := 0
+	gears := []SymbolLocation{}
+	for _, symbol := range symbols {
+		if symbol.Symbol == "*" {
+			gears = append(gears, symbol)
+		}
+	}
+	gearValueIndexes := map[int][]int{}
+	for i, value := range values {
+		yes, index := value.AdjacentToSymbol(gears)
+		if yes {
+			if gearValueIndexes[index] == nil {
+				gearValueIndexes[index] = []int{i}
+			} else {
+				gearValueIndexes[index] = append(gearValueIndexes[index], i)
+			}
+		}
+	}
+
+	for _, valueIndexes := range gearValueIndexes {
+		if len(valueIndexes) == 2 {
+			cml = cml + (values[valueIndexes[0]].Value * values[valueIndexes[1]].Value)
+		}
+	}
+
 	return cml
 }
 
@@ -113,4 +143,5 @@ func main() {
 	val, sym := ParseGridToEntities(stringput, '.')
 
 	fmt.Println("Result: ", GetSumAdjacentToSymbols(val, sym))
+	fmt.Println("Result: ", GetSumOfGearRatios(val, sym))
 }
