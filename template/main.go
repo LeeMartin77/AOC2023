@@ -1,11 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
-func myTestFunction() int {
+func myTestFunction(input string) int {
 	return 1
 }
 
 func main() {
-	fmt.Printf("Result: %v", myTestFunction())
+	buf, _ := os.ReadFile("data.txt")
+	stringput := string(buf)
+	fmt.Printf("Result: %v", myTestFunction(stringput))
 }
