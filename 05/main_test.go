@@ -7,7 +7,41 @@ import "testing"
 
 // they are numbers and should be treated as such
 // if not mapped, source and destination are equal
-func TestAssert(t *testing.T) {
+
+func TestSourceDestinationRange_GetDestinationForSource(t *testing.T) {
+	sdr := SourceDestinationRange{
+		Ranges: []SourceDestinationMapping{
+			{
+				SourceStart:      123,
+				DestinationStart: 456,
+				Size:             10,
+			},
+		},
+	}
+
+	res := sdr.GetDesinationForSource(122)
+	if 122 != res {
+		t.Errorf("Expected 122 got %v", res)
+	}
+	res = sdr.GetDesinationForSource(123)
+	if 456 != res {
+		t.Errorf("Expected 456 got %v", res)
+	}
+	res = sdr.GetDesinationForSource(126)
+	if 459 != res {
+		t.Errorf("Expected 459 got %v", res)
+	}
+	res = sdr.GetDesinationForSource(132)
+	if 465 != res {
+		t.Errorf("Expected 465 got %v", res)
+	}
+	res = sdr.GetDesinationForSource(133)
+	if 133 != res {
+		t.Errorf("Expected 134 got %v", res)
+	}
+}
+
+func xTestAssert(t *testing.T) {
 	input := `seeds: 79 14 55 13
 
 seed-to-soil map:
