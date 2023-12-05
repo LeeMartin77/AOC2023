@@ -124,6 +124,21 @@ humidity-to-location map:
 	}
 }
 
+func TestConvertSeedRangesToExpanded(t *testing.T) {
+	almnc := Almanac{
+		Seeds: []int{79, 4, 53, 6},
+	}
+
+	almnc.TurnSeedRangesToAllSeeds()
+
+	expectedSeeds := []int{79, 80, 81, 82, 53, 54, 55, 56, 57, 58}
+	for i, exp := range expectedSeeds {
+		if almnc.Seeds[i] != exp {
+			t.Errorf("Expected %v got %v", exp, almnc.Seeds[i])
+		}
+	}
+}
+
 func TestAssert(t *testing.T) {
 	input := `seeds: 79 14 55 13
 
