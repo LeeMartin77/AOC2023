@@ -60,6 +60,32 @@ func (almnc *Almanac) GetLowestLocationNumberThatCanTakeAnySeed() int {
 	return res
 }
 
+func (almnc *Almanac) GetLowestLocationNumberThatCanTakeAnySeedFromRanges() int {
+	res := 0
+	start := true
+	root := 0
+	for i, val := range almnc.Seeds {
+		if start {
+			root = val
+		} else {
+			i = 0
+			for val > 0 {
+				i = i + 1
+				val = val - 1
+				sres := root + i
+				for _, mping := range almnc.Mappings {
+					sres = mping.GetDesinationForSource(sres)
+				}
+				if sres < res || res == 0 {
+					res = sres
+				}
+			}
+		}
+		start = !start
+	}
+	return res
+}
+
 func (almnc *Almanac) TurnSeedRangesToAllSeeds() {
 	start := true
 	newSeeds := []int{}
@@ -130,8 +156,7 @@ func main() {
 	almanac, _ := ParseAlmanac(stringput)
 
 	res := almanac.GetLowestLocationNumberThatCanTakeAnySeed()
-	fmt.Printf("Pt 1 Result: %v", res)
-	almanac.TurnSeedRangesToAllSeeds()
-	res = almanac.GetLowestLocationNumberThatCanTakeAnySeed()
-	fmt.Printf("Pt 2 Result: %v", res)
+	fmt.Printf("Pt 1 Result: %v\n", res)
+	res = almanac.GetLowestLocationNumberThatCanTakeAnySeedFromRanges()
+	fmt.Printf("Pt 2 Result: %v\n", res)
 }
