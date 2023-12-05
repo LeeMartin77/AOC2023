@@ -47,7 +47,17 @@ type Almanac struct {
 }
 
 func (almnc *Almanac) GetLowestLocationNumberThatCanTakeAnySeed() int {
-	return 0
+	res := 0
+	for _, seed := range almnc.Seeds {
+		sres := seed
+		for _, mping := range almnc.Mappings {
+			sres = mping.GetDesinationForSource(sres)
+		}
+		if sres < res || res == 0 {
+			res = sres
+		}
+	}
+	return res
 }
 
 func ParseAlmanac(input string) (*Almanac, error) {

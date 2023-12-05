@@ -124,7 +124,7 @@ humidity-to-location map:
 	}
 }
 
-func xTestAssert(t *testing.T) {
+func TestAssert(t *testing.T) {
 	input := `seeds: 79 14 55 13
 
 seed-to-soil map:
