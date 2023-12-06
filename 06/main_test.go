@@ -30,6 +30,22 @@ Distance:  9  40  200`
 	}
 }
 
+func TestMakeMegarace(t *testing.T) {
+	input := `Time:      7  15   30
+Distance:  9  40  200`
+	rcs := ParseRaces(input)
+
+	res := GenerateMegarace(rcs)
+
+	expected := Race{
+		Duration: 71530,
+		Record:   940200,
+	}
+	if !reflect.DeepEqual(expected, res) {
+		t.Errorf("Expected %v got %v", expected, res)
+	}
+}
+
 func TestGetVictoryBounds(t *testing.T) {
 	testRace := Race{
 		Duration: 7,

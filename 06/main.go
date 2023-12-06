@@ -80,6 +80,24 @@ func ParseRaces(input string) []Race {
 	return races
 }
 
+func GenerateMegarace(rcs []Race) Race {
+	durBuff := ""
+	recBuff := ""
+
+	for _, rc := range rcs {
+		durBuff = durBuff + fmt.Sprint(rc.Duration)
+		recBuff = recBuff + fmt.Sprint(rc.Record)
+	}
+
+	dur, _ := strconv.Atoi(durBuff)
+	rec, _ := strconv.Atoi(recBuff)
+
+	return Race{
+		Duration: dur,
+		Record:   rec,
+	}
+}
+
 func main() {
 	buf, _ := os.ReadFile("data.txt")
 	stringput := string(buf)
@@ -92,5 +110,11 @@ func main() {
 		total = total * (upper - lower + 1)
 	}
 
-	fmt.Printf("Result: %v\n", total)
+	fmt.Printf("Result 1: %v\n", total)
+
+	mega := GenerateMegarace(res)
+
+	lower, upper := mega.GetVictoryBounds()
+
+	fmt.Printf("Result 2: %v\n", upper-lower+1)
 }
