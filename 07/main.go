@@ -57,6 +57,40 @@ func ParseHand(input string) Hand {
 	return hnd
 }
 
+// A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, or 2. The relative strength of each card follows this order
+
+var CardStrengths map[rune]int = map[rune]int{
+	'A': 12,
+	'K': 11,
+	'Q': 10,
+	'J': 9,
+	'T': 8,
+	'9': 7,
+	'8': 6,
+	'7': 5,
+	'6': 4,
+	'5': 3,
+	'4': 2,
+	'3': 1,
+	'2': 0,
+}
+
+func (hnd Hand) DoesItBeat(other Hand) bool {
+	if hnd.Strength > other.Strength {
+		return true
+	}
+	if hnd.Strength == other.Strength {
+		for i := range hnd.Cards {
+			if CardStrengths[hnd.Cards[i]] > CardStrengths[other.Cards[i]] {
+				return true
+			} else if CardStrengths[hnd.Cards[i]] < CardStrengths[other.Cards[i]] {
+				return false
+			}
+		}
+	}
+	return false
+}
+
 func ParseHandList(input string) []Hand {
 	ret := []Hand{}
 	for _, line := range strings.Split(input, "\n") {

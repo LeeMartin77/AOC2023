@@ -49,6 +49,48 @@ QQQQQ 0`
 	}
 }
 
+func TestDoesItBeat_DiffStrength(t *testing.T) {
+	handOne := Hand{
+		Cards:    []rune{'K', 'K', '6', '7', '7'},
+		Bid:      28,
+		Strength: 2,
+	}
+
+	handTwo := Hand{
+		Cards:    []rune{'K', 'K', '7', '7', '7'},
+		Bid:      28,
+		Strength: 4,
+	}
+
+	if handOne.DoesItBeat(handTwo) {
+		t.Errorf("Expected false got true")
+	}
+	if !handTwo.DoesItBeat(handOne) {
+		t.Errorf("Expected true got false")
+	}
+}
+
+func TestDoesItBeat_SameStrength(t *testing.T) {
+	handOne := Hand{
+		Cards:    []rune{'K', 'K', '6', '7', '7'},
+		Bid:      28,
+		Strength: 2,
+	}
+
+	handTwo := Hand{
+		Cards:    []rune{'A', 'A', '6', '7', '7'},
+		Bid:      28,
+		Strength: 2,
+	}
+
+	if handOne.DoesItBeat(handTwo) {
+		t.Errorf("Expected false got true")
+	}
+	if !handTwo.DoesItBeat(handOne) {
+		t.Errorf("Expected true got false")
+	}
+}
+
 func TestParse(t *testing.T) {
 	input := `32T3K 765`
 	hand := ParseHand(input)
