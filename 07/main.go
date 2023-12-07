@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -104,21 +105,12 @@ func ParseHandList(input string) []Hand {
 //Now, you can determine the total winnings of this set of hands by adding up the result of multiplying each hand's bid with its rank (765 * 1 + 220 * 2 + 28 * 3 + 684 * 4 + 483 * 5). So the total winnings in this example are 6440.
 
 func GetPartOneResult(hands []Hand) int {
-	var sorted = []Hand{}
-	for _, hnd := range hands {
-		insertAt := 0
-		for ii := range sorted {
-			if hnd.DoesItBeat(sorted[ii]) {
-				insertAt = ii
-				break
-			}
-		}
-		sorted = append(sorted[:insertAt], append([]Hand{hnd}, sorted[insertAt:]...)...)
-	}
+	sort.SliceStable(hands, func(i, j int) bool {
+		return hands[i].DoesItBeat(hands[j])
+	})
 	sum := 0
 	currentRank := len(hands)
-	for i, hnd := range sorted {
-		fmt.Printf("%d: %v\n", i, hnd.Cards)
+	for _, hnd := range hands {
 		sum = sum + currentRank*hnd.Bid
 		currentRank = currentRank - 1
 	}
@@ -132,5 +124,5 @@ func main() {
 	hands := ParseHandList(stringput)
 
 	res := GetPartOneResult(hands)
-	fmt.Printf("Result: %v", res)
+	fmt.Printf("Result: %v\n", res)
 }
