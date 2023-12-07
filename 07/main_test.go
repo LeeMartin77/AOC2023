@@ -28,6 +28,20 @@ QQQJA 483`
 	}
 }
 
+func TestPartOneResult(t *testing.T) {
+	input := `32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483`
+	hands := ParseHandList(input)
+
+	res := GetPartOneResult(hands)
+	if res != 6440 {
+		t.Errorf("Expected 6440 got %d", res)
+	}
+}
+
 func TestParsingStrengths(t *testing.T) {
 	input := `23456 0
 23455 0

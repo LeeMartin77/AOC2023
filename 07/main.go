@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -99,8 +101,35 @@ func ParseHandList(input string) []Hand {
 	return ret
 }
 
+//Now, you can determine the total winnings of this set of hands by adding up the result of multiplying each hand's bid with its rank (765 * 1 + 220 * 2 + 28 * 3 + 684 * 4 + 483 * 5). So the total winnings in this example are 6440.
+
+func GetPartOneResult(hands []Hand) int {
+	var sorted = []Hand{}
+	for _, hnd := range hands {
+		insertAt := 0
+		for ii := range sorted {
+			if hnd.DoesItBeat(sorted[ii]) {
+				insertAt = ii
+				break
+			}
+		}
+		sorted = append(sorted[:insertAt], append([]Hand{hnd}, sorted[insertAt:]...)...)
+	}
+	sum := 0
+	currentRank := len(hands)
+	for _, hnd := range sorted {
+		sum = sum + currentRank*hnd.Bid
+		currentRank = currentRank - 1
+	}
+	return sum
+}
+
 func main() {
-	// buf, _ := os.ReadFile("data.txt")
-	// stringput := string(buf)
-	// fmt.Printf("Result: %v", myTestFunction(stringput))
+	buf, _ := os.ReadFile("data.txt")
+	stringput := string(buf)
+
+	hands := ParseHandList(stringput)
+
+	res := GetPartOneResult(hands)
+	fmt.Printf("Result: %v", res)
 }
