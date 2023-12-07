@@ -105,6 +105,27 @@ func TestDoesItBeat_SameStrength(t *testing.T) {
 	}
 }
 
+func TestDoesItBeat_SameStrength_NotFirst(t *testing.T) {
+	handOne := Hand{
+		Cards:    []rune{'K', 'K', '6', '7', '7'},
+		Bid:      28,
+		Strength: 2,
+	}
+
+	handTwo := Hand{
+		Cards:    []rune{'K', 'K', '7', '6', '7'},
+		Bid:      28,
+		Strength: 2,
+	}
+
+	if handOne.DoesItBeat(handTwo) {
+		t.Errorf("Expected false got true")
+	}
+	if !handTwo.DoesItBeat(handOne) {
+		t.Errorf("Expected true got false")
+	}
+}
+
 func TestParse(t *testing.T) {
 	input := `32T3K 765`
 	hand := ParseHand(input)

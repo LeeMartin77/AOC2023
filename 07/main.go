@@ -117,7 +117,8 @@ func GetPartOneResult(hands []Hand) int {
 	}
 	sum := 0
 	currentRank := len(hands)
-	for _, hnd := range sorted {
+	for i, hnd := range sorted {
+		fmt.Printf("%d: %v\n", i, hnd.Cards)
 		sum = sum + currentRank*hnd.Bid
 		currentRank = currentRank - 1
 	}
