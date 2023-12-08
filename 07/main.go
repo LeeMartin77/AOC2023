@@ -17,9 +17,10 @@ import (
 // 0 High card, where all cards' labels are distinct: 23456
 
 type Hand struct {
-	Cards    []rune
-	Bid      int
-	Strength int
+	Cards         []rune
+	Bid           int
+	Strength      int
+	JokerStrength int
 }
 
 func ParseHand(input string) Hand {
@@ -53,6 +54,44 @@ func ParseHand(input string) Hand {
 		hnd.Strength = 3
 	} else {
 		hnd.Strength = 4
+	}
+
+	if counts['J'] == 5 {
+		hnd.JokerStrength = 0
+	} else if counts['J'] > 0 {
+		jkcountValues := []int{}
+		max := 0
+		for k, val := range counts {
+			if k == 'J' {
+				continue
+			}
+			jkcountValues = append(jkcountValues, val)
+			if val > max {
+				max = val
+			}
+		}
+		sort.SliceStable(jkcountValues, func(i, j int) bool {
+			return jkcountValues[i] > jkcountValues[j]
+		})
+		jkcountValues[0] = jkcountValues[0] + counts['J']
+		max = jkcountValues[0]
+		if max == 5 {
+			hnd.JokerStrength = 6
+		} else if max == 4 {
+			hnd.JokerStrength = 5
+		} else if len(countValues) == 5 {
+			hnd.JokerStrength = 0
+		} else if len(countValues) == 4 {
+			hnd.JokerStrength = 1
+		} else if len(countValues) == 3 && max == 2 {
+			hnd.JokerStrength = 2
+		} else if len(countValues) == 3 && max == 3 {
+			hnd.JokerStrength = 3
+		} else {
+			hnd.JokerStrength = 4
+		}
+	} else {
+		hnd.JokerStrength = hnd.Strength
 	}
 
 	bid, _ := strconv.Atoi(parts[1])
@@ -93,6 +132,27 @@ func (hnd Hand) DoesItBeat(other Hand) bool {
 	}
 	return false
 }
+func (hnd Hand) DoesItBeatJoker(other Hand) bool {
+	if hnd.JokerStrength > other.JokerStrength {
+		return true
+	}
+	if hnd.JokerStrength == other.JokerStrength {
+		for i := range hnd.Cards {
+			if hnd.Cards[i] == 'J' && other.Cards[i] != 'J' {
+				return false
+			}
+			if hnd.Cards[i] != 'J' && other.Cards[i] == 'J' {
+				return true
+			}
+			if CardStrengths[hnd.Cards[i]] > CardStrengths[other.Cards[i]] {
+				return true
+			} else if CardStrengths[hnd.Cards[i]] < CardStrengths[other.Cards[i]] {
+				return false
+			}
+		}
+	}
+	return false
+}
 
 func ParseHandList(input string) []Hand {
 	ret := []Hand{}
@@ -117,6 +177,19 @@ func GetPartOneResult(hands []Hand) int {
 	return sum
 }
 
+func GetPartTwoResult(hands []Hand) int {
+	sort.SliceStable(hands, func(i, j int) bool {
+		return hands[i].DoesItBeatJoker(hands[j])
+	})
+	sum := 0
+	currentRank := len(hands)
+	for _, hnd := range hands {
+		sum = sum + currentRank*hnd.Bid
+		currentRank = currentRank - 1
+	}
+	return sum
+}
+
 func main() {
 	buf, _ := os.ReadFile("data.txt")
 	stringput := string(buf)
@@ -124,5 +197,7 @@ func main() {
 	hands := ParseHandList(stringput)
 
 	res := GetPartOneResult(hands)
+	fmt.Printf("Result: %v\n", res)
+	res = GetPartTwoResult(hands)
 	fmt.Printf("Result: %v\n", res)
 }

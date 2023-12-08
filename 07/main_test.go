@@ -18,9 +18,10 @@ QQQJA 483`
 	}
 
 	expectedHand := Hand{
-		Cards:    []rune{'K', 'K', '6', '7', '7'},
-		Bid:      28,
-		Strength: 2,
+		Cards:         []rune{'K', 'K', '6', '7', '7'},
+		Bid:           28,
+		Strength:      2,
+		JokerStrength: 2,
 	}
 
 	if !reflect.DeepEqual(hands[2], expectedHand) {
@@ -39,6 +40,20 @@ QQQJA 483`
 	res := GetPartOneResult(hands)
 	if res != 6440 {
 		t.Errorf("Expected 6440 got %d", res)
+	}
+}
+
+func TestPartTwoResult(t *testing.T) {
+	input := `32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483`
+	hands := ParseHandList(input)
+
+	res := GetPartTwoResult(hands)
+	if res != 5905 {
+		t.Errorf("Expected 5905 got %d", res)
 	}
 }
 
@@ -131,9 +146,10 @@ func TestParse(t *testing.T) {
 	hand := ParseHand(input)
 
 	expectedHand := Hand{
-		Cards:    []rune{'3', '2', 'T', '3', 'K'},
-		Bid:      765,
-		Strength: 1,
+		Cards:         []rune{'3', '2', 'T', '3', 'K'},
+		Bid:           765,
+		Strength:      1,
+		JokerStrength: 1,
 	}
 
 	if !reflect.DeepEqual(hand, expectedHand) {
