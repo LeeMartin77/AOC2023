@@ -39,10 +39,9 @@ func TestPartOneRouting(t *testing.T) {
 .L-J.
 .....`
 	startPos, tiles := ParseTiles(input)
-	length := GetLengthOfLoop(startPos, tiles)
-	if length != 8 {
-
-		t.Errorf("Expected 8 got %v", length)
+	loop, _ := GetLoop(startPos, tiles)
+	if len(loop) != 8 {
+		t.Errorf("Expected 8 got %v", len(loop))
 	}
 }
 

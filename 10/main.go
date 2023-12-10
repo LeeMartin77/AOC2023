@@ -118,7 +118,7 @@ func RecurrAlongRoute(tiles [][]Tile, start InputOutput, shuttle InputOutput, ro
 	return RecurrAlongRoute(tiles, start, InputOutput{nextConnection.X, nextConnection.Y}, route)
 }
 
-func GetLengthOfLoop(start InputOutput, tiles [][]Tile) int {
+func GetLoop(start InputOutput, tiles [][]Tile) ([]InputOutput, error) {
 	shuttles, routes := GetShuttlesAndRoutes(start, tiles)
 	isLoop := []bool{}
 	for i, shuttle := range shuttles {
@@ -128,20 +128,21 @@ func GetLengthOfLoop(start InputOutput, tiles [][]Tile) int {
 		isLoop[i] = isL
 		routes[i] = route
 	}
-	count := 0
 	for i, success := range isLoop {
 		if success {
-			count = len(routes[i])
-			break
+			return routes[i], nil
 		}
 	}
-	return count
+	return []InputOutput{}, fmt.Errorf("Couldn't find a route")
 }
 
 func main() {
 	buf, _ := os.ReadFile("data.txt")
 	input := string(buf)
 	startPos, tiles := ParseTiles(input)
-	length := GetLengthOfLoop(startPos, tiles)
-	fmt.Printf("Result: %v\n", length/2)
+	loop, err := GetLoop(startPos, tiles)
+	if err != nil {
+		panic("OH NO")
+	}
+	fmt.Printf("Result: %v\n", len(loop)/2)
 }
