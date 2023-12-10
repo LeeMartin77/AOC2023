@@ -45,6 +45,51 @@ func TestPartOneRouting(t *testing.T) {
 	}
 }
 
+func TestPartTwoGetInternal_Basic(t *testing.T) {
+	input := `..........
+.S------7.
+.|F----7|.
+.||....||.
+.||....||.
+.|L-7F-J|.
+.|..||..|.
+.L--JL--J.
+..........`
+
+	startPos, tiles := ParseTiles(input)
+	loop, _ := GetLoop(startPos, tiles)
+	if len(loop) != 44 {
+		t.Errorf("Expected 44 got %v", len(loop))
+	}
+	res := GetCountInsideLoop(tiles, loop)
+	if res != 4 {
+		t.Errorf("Expected 4 got %v", res)
+	}
+}
+
+func TestPartTwoGetInternal_Advanced(t *testing.T) {
+	input := `.F----7F7F7F7F-7....
+.|F--7||||||||FJ....
+.||.FJ||||||||L7....
+FJL7L7LJLJ||LJ.L-7..
+L--J.L7...LJS7F-7L7.
+....F-J..F7FJ|L7L7L7
+....L7.F7||L7|.L7L7|
+.....|FJLJ|FJ|F7|.LJ
+....FJL-7.||.||||...
+....L---J.LJ.LJLJ...`
+
+	startPos, tiles := ParseTiles(input)
+	loop, _ := GetLoop(startPos, tiles)
+	if len(loop) != 140 {
+		t.Errorf("Expected 140 got %v", len(loop))
+	}
+	res := GetCountInsideLoop(tiles, loop)
+	if res != 8 {
+		t.Errorf("Expected 8 got %v", res)
+	}
+}
+
 func TestShuttleGenerating(t *testing.T) {
 	input := `.....
 .S-7.

@@ -42,6 +42,10 @@ func (tl Tile) ConnectsTo() []InputOutput {
 	return res
 }
 
+func (tl Tile) IsHorizontal() bool {
+	return tl.Rune == '-' || tl.Rune == 'L' || tl.Rune == 'F' || tl.Rune == 'S'
+}
+
 func ParseTiles(input string) (InputOutput, [][]Tile) {
 	tiles := [][]Tile{}
 	startPos := InputOutput{}
@@ -136,6 +140,28 @@ func GetLoop(start InputOutput, tiles [][]Tile) ([]InputOutput, error) {
 	return []InputOutput{}, fmt.Errorf("Couldn't find a route")
 }
 
+func GetCountInsideLoop(tiles [][]Tile, loop []InputOutput) int {
+	capacity := 0
+	for _, col := range tiles {
+		inside := false
+		for _, tile := range col {
+			isInLoop := false
+			for _, lp := range loop {
+				if lp.X == tile.X && lp.Y == tile.Y {
+					isInLoop = true
+				}
+			}
+			if tile.IsHorizontal() {
+				inside = !inside
+			}
+			if !isInLoop && inside {
+				capacity = capacity + 1
+			}
+		}
+	}
+	return capacity
+}
+
 func main() {
 	buf, _ := os.ReadFile("data.txt")
 	input := string(buf)
@@ -145,4 +171,6 @@ func main() {
 		panic("OH NO")
 	}
 	fmt.Printf("Result: %v\n", len(loop)/2)
+	res := GetCountInsideLoop(tiles, loop)
+	fmt.Printf("Result: %v\n", res)
 }
