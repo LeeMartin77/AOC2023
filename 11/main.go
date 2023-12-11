@@ -38,7 +38,7 @@ func ParseGalaxies(input string) []Galaxy {
 	return galaxies
 }
 
-func ExpandUniverse(universe []Galaxy) []Galaxy {
+func ExpandUniverse(universe []Galaxy, expansionRate int) []Galaxy {
 	expanded := universe
 	columns := []int{}
 	rows := []int{}
@@ -76,7 +76,7 @@ func ExpandUniverse(universe []Galaxy) []Galaxy {
 		if !slices.Contains(columns, i) {
 			for ii, gal := range universe {
 				if gal.X > i {
-					expanded[ii].X = expanded[ii].X + 1
+					expanded[ii].X = expanded[ii].X + expansionRate - 1
 				}
 			}
 		}
@@ -85,7 +85,7 @@ func ExpandUniverse(universe []Galaxy) []Galaxy {
 		if !slices.Contains(rows, i) {
 			for ii, gal := range universe {
 				if gal.Y > i {
-					expanded[ii].Y = expanded[ii].Y + 1
+					expanded[ii].Y = expanded[ii].Y + expansionRate - 1
 				}
 			}
 		}
@@ -114,7 +114,7 @@ func main() {
 	input := string(buf)
 	initial := ParseGalaxies(input)
 
-	expanded := ExpandUniverse(initial)
+	expanded := ExpandUniverse(initial, 2)
 
 	pairs := CreatePairs(expanded)
 	cuml := 0
@@ -123,4 +123,15 @@ func main() {
 	}
 
 	fmt.Printf("Result pt1: %d\n", cuml)
+
+	init := ParseGalaxies(input)
+	megaspansion := ExpandUniverse(init, 1000000)
+
+	megapairs := CreatePairs(megaspansion)
+	megacuml := 0
+	for _, pair := range megapairs {
+		megacuml = megacuml + pair.GetDistance()
+	}
+
+	fmt.Printf("Result pt2: %d\n", megacuml)
 }

@@ -63,7 +63,7 @@ func TestUniverseExpansion(t *testing.T) {
 #....#.......`
 	expected := ParseGalaxies(expectedInput)
 
-	res := ExpandUniverse(initial)
+	res := ExpandUniverse(initial, 2)
 
 	for i, gl := range expected {
 		if gl.X != res[i].X || gl.Y != res[i].Y {
@@ -136,7 +136,7 @@ func TestIntegration(t *testing.T) {
 #...#.....`
 	initial := ParseGalaxies(input)
 
-	expanded := ExpandUniverse(initial)
+	expanded := ExpandUniverse(initial, 2)
 
 	pairs := CreatePairs(expanded)
 	cuml := 0
@@ -146,5 +146,57 @@ func TestIntegration(t *testing.T) {
 
 	if cuml != 374 {
 		t.Errorf("Expected 374 got %v", cuml)
+	}
+}
+
+func TestIntegration_10(t *testing.T) {
+	input := `...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....`
+	initial := ParseGalaxies(input)
+
+	expanded := ExpandUniverse(initial, 10)
+
+	pairs := CreatePairs(expanded)
+	cuml := 0
+	for _, pair := range pairs {
+		cuml = cuml + pair.GetDistance()
+	}
+
+	if cuml != 1030 {
+		t.Errorf("Expected 1030 got %v", cuml)
+	}
+}
+
+func TestIntegration_100(t *testing.T) {
+	input := `...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....`
+	initial := ParseGalaxies(input)
+
+	expanded := ExpandUniverse(initial, 100)
+
+	pairs := CreatePairs(expanded)
+	cuml := 0
+	for _, pair := range pairs {
+		cuml = cuml + pair.GetDistance()
+	}
+
+	if cuml != 8410 {
+		t.Errorf("Expected 8410 got %v", cuml)
 	}
 }
