@@ -33,6 +33,31 @@ func ParseLine(input string) Record {
 	}
 }
 
+func concatMultipleSlices[T any](slices [][]T) []T {
+	var totalLen int
+
+	for _, s := range slices {
+		totalLen += len(s)
+	}
+
+	result := make([]T, totalLen)
+
+	var i int
+
+	for _, s := range slices {
+		i += copy(result[i:], s)
+	}
+
+	return result
+}
+
+func Unfold(rec Record) Record {
+	return Record{
+		Entries:  concatMultipleSlices([][]rune{rec.Entries, []rune{'?'}, rec.Entries, []rune{'?'}, rec.Entries, []rune{'?'}, rec.Entries, []rune{'?'}, rec.Entries}),
+		Checksum: concatMultipleSlices([][]int{rec.Checksum, rec.Checksum, rec.Checksum, rec.Checksum, rec.Checksum}),
+	}
+}
+
 func ChecksumBitmask(checksum []int) int {
 	basemask := 0
 	mskVal := 1
@@ -120,4 +145,10 @@ func main() {
 		cuml = cuml + PossibleConfigurations(ParseLine(str))
 	}
 	fmt.Println(cuml)
+	cuml2 := 0
+
+	for _, str := range strings.Split(stringput, "\n") {
+		cuml2 = cuml2 + PossibleConfigurations(Unfold(ParseLine(str)))
+	}
+	fmt.Println(cuml2)
 }

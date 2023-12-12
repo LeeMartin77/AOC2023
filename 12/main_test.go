@@ -1,6 +1,7 @@
 package main
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -40,6 +41,18 @@ func TestFulfillsChecksum(t *testing.T) {
 	}
 }
 
+func TestUnfold(t *testing.T) {
+	orig := ParseLine("???.### 1,1,3")
+	expect := ParseLine("???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3")
+	mod := Unfold(orig)
+	if !reflect.DeepEqual(expect.Checksum, mod.Checksum) {
+		t.Errorf("Exp: %v \nGot: %v", expect.Checksum, mod.Checksum)
+	}
+	if !reflect.DeepEqual(expect.Entries, mod.Entries) {
+		t.Errorf("Exp: %v \nGot: %v", expect.Entries, mod.Entries)
+	}
+}
+
 func TestPossibleConfigurations(t *testing.T) {
 	res := PossibleConfigurations(ParseLine(strings.Split(example, "\n")[0]))
 	if res != 1 {
@@ -52,5 +65,19 @@ func TestPossibleConfigurations(t *testing.T) {
 	res = PossibleConfigurations(ParseLine(strings.Split(example, "\n")[5]))
 	if res != 10 {
 		t.Errorf("Expected 10 got %v", res)
+	}
+}
+func TestPossibleUnfoldedConfigurations(t *testing.T) {
+	res := PossibleConfigurations(Unfold(ParseLine(strings.Split(example, "\n")[0])))
+	if res != 1 {
+		t.Errorf("Expected 1 got %v", res)
+	}
+	res = PossibleConfigurations(Unfold(ParseLine(strings.Split(example, "\n")[1])))
+	if res != 16384 {
+		t.Errorf("Expected 16384 got %v", res)
+	}
+	res = PossibleConfigurations(Unfold(ParseLine(strings.Split(example, "\n")[5])))
+	if res != 506250 {
+		t.Errorf("Expected 506250 got %v", res)
 	}
 }
