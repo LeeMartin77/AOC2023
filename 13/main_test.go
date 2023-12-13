@@ -56,11 +56,20 @@ func TestGetVerticalHashes(t *testing.T) {
 	}
 }
 
+// func TestGetDesmudgedHorizHashes(t *testing.T) {
+// 	res := ParsePatterns(exampleInput)[0]
+// 	res.GetSmudgedPatterns()
+// }
+
 func TestIntegration(t *testing.T) {
 	ptrns := ParsePatterns(exampleInput)
 	cuml, _ := AccumulateReflections(ptrns)
 	if cuml != 405 {
 		t.Errorf("Expected '405' got '%v'", cuml)
+	}
+	cuml2, _ := AccumulateSmudgedReflections(ptrns)
+	if cuml2 != 400 {
+		t.Errorf("Expected '400' got '%v'", cuml2)
 	}
 }
 

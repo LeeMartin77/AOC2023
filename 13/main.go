@@ -30,6 +30,7 @@ func (ptrn Pattern) GetHorizontalHashes() []int {
 	}
 	return hashes
 }
+
 func (ptrn Pattern) GetVerticalHashes() []int {
 	hashes := []int{}
 	for range ptrn.Lines[0] {
@@ -47,8 +48,42 @@ func (ptrn Pattern) GetVerticalHashes() []int {
 	return hashes
 }
 
+// lolbruteforcetime
+func (ptrn Pattern) GetSmudgedPatterns() []Pattern {
+	ptrns := []Pattern{}
+	for i, ln := range ptrn.Lines {
+		for ii := range ln {
+			pt := Pattern{}
+			for j, li := range ptrn.Lines {
+				pt.Lines = append(pt.Lines, li)
+				if j == i {
+					// sub a char
+					if pt.Lines[j][ii] == ash {
+						pt.Lines[j] = pt.Lines[j][:ii] + string(rock) + pt.Lines[j][ii+1:]
+					} else {
+						pt.Lines[j] = pt.Lines[j][:ii] + string(ash) + pt.Lines[j][ii+1:]
+					}
+				}
+			}
+			ptrns = append(ptrns, pt)
+		}
+	}
+	return ptrns
+}
+
+func (ptrn Pattern) GetSmudgedReflectionPoint() (bool, int, error) {
+	patterns := ptrn.GetSmudgedPatterns()
+	for _, pat := range patterns {
+		vert, idx, err := GetReflectionPoint(pat)
+		if err == nil {
+			return vert, idx, err
+		}
+	}
+	return true, 0, fmt.Errorf("No reflection")
+}
+
 // vertical, index, notfound
-func (ptrn Pattern) GetReflectionPoint() (bool, int, error) {
+func GetReflectionPoint(ptrn Pattern) (bool, int, error) {
 	vert := true
 	indx, err := FindReflectionPoint(ptrn.GetVerticalHashes())
 	if err != nil {
@@ -112,7 +147,24 @@ func ParsePatterns(input string) []Pattern {
 func AccumulateReflections(patterns []Pattern) (int, error) {
 	cuml := 0
 	for i, ptrn := range patterns {
-		vert, indx, err := ptrn.GetReflectionPoint()
+		vert, indx, err := GetReflectionPoint(ptrn)
+		if err != nil {
+			return 0, fmt.Errorf("Error on pattern: %v\n", i)
+		}
+		num := indx
+		if vert {
+			cuml = cuml + num
+		} else {
+			cuml = cuml + (num * 100)
+		}
+	}
+	return cuml, nil
+}
+
+func AccumulateSmudgedReflections(patterns []Pattern) (int, error) {
+	cuml := 0
+	for i, ptrn := range patterns {
+		vert, indx, err := ptrn.GetSmudgedReflectionPoint()
 		if err != nil {
 			return 0, fmt.Errorf("Error on pattern: %v\n", i)
 		}
@@ -137,4 +189,10 @@ func main() {
 		fmt.Printf("Err: %v\n", err)
 	}
 	fmt.Printf("Result: %v\n", cuml)
+	cuml2, err2 := AccumulateSmudgedReflections(ptrns)
+	if err2 != nil {
+
+		fmt.Printf("Err: %v\n", err2)
+	}
+	fmt.Printf("Result2: %v\n", cuml2)
 }
