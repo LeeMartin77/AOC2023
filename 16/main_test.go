@@ -38,7 +38,7 @@ func TestHitEmpty(t *testing.T) {
 		Position: Coordinate{0, 3},
 		Velocity: Coordinate{1, 0},
 	}}
-	endBeams, history := ProgressLight(res, startBeams, Coordinate{10, 10})
+	endBeams, history := ProgressLight(res, startBeams, Coordinate{10, 10}, map[int]map[int][]Coordinate{})
 
 	expectedBeam := LightBeam{
 		Position: Coordinate{1, 3},
@@ -64,7 +64,7 @@ func TestHitMirror(t *testing.T) {
 		Position: Coordinate{X: 4, Y: 1},
 		Velocity: Coordinate{X: 1, Y: 0},
 	}}
-	endBeams, history := ProgressLight(res, startBeams, lmt)
+	endBeams, history := ProgressLight(res, startBeams, lmt, map[int]map[int][]Coordinate{})
 
 	expectedBeam := LightBeam{
 		Position: Coordinate{4, 2},
@@ -90,7 +90,7 @@ func TestHitMirrorOther(t *testing.T) {
 		Position: Coordinate{X: 4, Y: 6},
 		Velocity: Coordinate{X: -1, Y: 0},
 	}}
-	endBeams, history := ProgressLight(res, startBeams, lmt)
+	endBeams, history := ProgressLight(res, startBeams, lmt, map[int]map[int][]Coordinate{})
 
 	expectedBeam := LightBeam{
 		Position: Coordinate{4, 7},
@@ -116,7 +116,7 @@ func TestHitSplitter(t *testing.T) {
 		Position: Coordinate{X: 6, Y: 8},
 		Velocity: Coordinate{X: 0, Y: -1},
 	}}
-	endBeams, history := ProgressLight(res, startBeams, lmt)
+	endBeams, history := ProgressLight(res, startBeams, lmt, map[int]map[int][]Coordinate{})
 
 	expectedBeams := []LightBeam{
 		{
@@ -151,7 +151,7 @@ func TestHitSplitterOther(t *testing.T) {
 		Position: Coordinate{X: 7, Y: 7},
 		Velocity: Coordinate{X: -1, Y: 0},
 	}}
-	endBeams, history := ProgressLight(res, startBeams, lmt)
+	endBeams, history := ProgressLight(res, startBeams, lmt, map[int]map[int][]Coordinate{})
 
 	expectedBeams := []LightBeam{
 		{

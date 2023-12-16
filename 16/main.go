@@ -14,7 +14,6 @@ type Coordinate struct {
 type LightBeam struct {
 	Position Coordinate
 	Velocity Coordinate
-	History  []LightBeam
 }
 
 func MatchingBeams(beamOne LightBeam, beamTwo LightBeam) bool {
@@ -37,7 +36,7 @@ func ParseMap(input string) ([][]rune, Coordinate) {
 }
 
 // beams, energised tiles
-func ProgressLight(mp [][]rune, beams []LightBeam, limits Coordinate) ([]LightBeam, map[int]map[int]int) {
+func ProgressLight(mp [][]rune, beams []LightBeam, limits Coordinate, visited map[int]map[int][]Coordinate) ([]LightBeam, map[int]map[int]int) {
 	hitTiles := map[int]map[int]int{}
 	outBeams := []LightBeam{}
 	for _, beam := range beams {
@@ -46,7 +45,11 @@ func ProgressLight(mp [][]rune, beams []LightBeam, limits Coordinate) ([]LightBe
 			hitTiles[beam.Position.X] = map[int]int{}
 		}
 		hitTiles[beam.Position.X][beam.Position.Y] = hitTiles[beam.Position.X][beam.Position.Y] + 1
-		beam.History = append(beam.History, LightBeam{Position: beam.Position, Velocity: beam.Velocity})
+		_, ok = visited[beam.Position.X]
+		if !ok {
+			visited[beam.Position.X] = map[int][]Coordinate{}
+		}
+		visited[beam.Position.X][beam.Position.Y] = append(visited[beam.Position.X][beam.Position.Y], beam.Velocity)
 		if mp[beam.Position.X][beam.Position.Y] == '.' {
 			// we just pass on through
 			beam.Position.X = beam.Position.X + beam.Velocity.X
@@ -113,12 +116,10 @@ func ProgressLight(mp [][]rune, beams []LightBeam, limits Coordinate) ([]LightBe
 				outBeams = append(outBeams, LightBeam{
 					Position: Coordinate{beam.Position.X - 1, beam.Position.Y},
 					Velocity: Coordinate{-1, 0},
-					History:  beam.History,
 				})
 				outBeams = append(outBeams, LightBeam{
 					Position: Coordinate{beam.Position.X + 1, beam.Position.Y},
 					Velocity: Coordinate{1, 0},
-					History:  beam.History,
 				})
 			}
 		} else if mp[beam.Position.X][beam.Position.Y] == '|' {
@@ -132,12 +133,10 @@ func ProgressLight(mp [][]rune, beams []LightBeam, limits Coordinate) ([]LightBe
 				outBeams = append(outBeams, LightBeam{
 					Position: Coordinate{beam.Position.X, beam.Position.Y - 1},
 					Velocity: Coordinate{0, -1},
-					History:  beam.History,
 				})
 				outBeams = append(outBeams, LightBeam{
 					Position: Coordinate{beam.Position.X, beam.Position.Y + 1},
 					Velocity: Coordinate{0, 1},
-					History:  beam.History,
 				})
 			}
 		}
@@ -149,8 +148,8 @@ outer:
 	for _, beam := range outBeams {
 		if beam.Position.X > -1 && beam.Position.Y > -1 &&
 			beam.Position.X <= limits.X && beam.Position.Y <= limits.Y {
-			for _, bm := range beam.History {
-				if MatchingBeams(bm, beam) {
+			for _, bm := range visited[beam.Position.X][beam.Position.Y] {
+				if beam.Velocity.X == bm.X && beam.Velocity.Y == bm.Y {
 					// we're in a loop
 					continue outer
 				}
@@ -163,8 +162,17 @@ outer:
 
 func IterateMapThrough(mp [][]rune, lmt Coordinate, beams []LightBeam) ([]LightBeam, map[int]map[int]int) {
 	totalHistory := map[int]map[int]int{}
+	visitedWithDirection := map[int]map[int][]Coordinate{}
+	for x, col := range mp {
+		visitedWithDirection[x] = map[int][]Coordinate{}
+		for y := range col {
+			visitedWithDirection[x][y] = []Coordinate{}
+		}
+	}
+	// fuck it we find loops a dumb way
+	maxTotalHistory := 0
 	for len(beams) > 0 {
-		nbms, history := ProgressLight(mp, beams, lmt)
+		nbms, history := ProgressLight(mp, beams, lmt, visitedWithDirection)
 		for k, kis := range history {
 			for kk, cnt := range kis {
 				_, ok := totalHistory[k]
@@ -172,6 +180,9 @@ func IterateMapThrough(mp [][]rune, lmt Coordinate, beams []LightBeam) ([]LightB
 					totalHistory[k] = map[int]int{}
 				}
 				totalHistory[k][kk] = totalHistory[k][kk] + cnt
+				if maxTotalHistory < totalHistory[k][kk] {
+					maxTotalHistory = totalHistory[k][kk]
+				}
 			}
 		}
 		beams = nbms
