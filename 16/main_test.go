@@ -199,3 +199,14 @@ func TestIntegration(t *testing.T) {
 		t.Errorf("Expected 46 got %v", cuml)
 	}
 }
+
+func TestFindLargest(t *testing.T) {
+
+	res, lmt := ParseMap(exampleMap)
+	largest := FindLargest(res, lmt)
+
+	if largest != 51 {
+
+		t.Errorf("Expected 51 got %v", largest)
+	}
+}

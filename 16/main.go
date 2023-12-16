@@ -169,7 +169,6 @@ func IterateMapThrough(mp [][]rune, lmt Coordinate, beams []LightBeam) ([]LightB
 			visitedWithDirection[x][y] = []Coordinate{}
 		}
 	}
-	// fuck it we find loops a dumb way
 	maxTotalHistory := 0
 	for len(beams) > 0 {
 		nbms, history := ProgressLight(mp, beams, lmt, visitedWithDirection)
@@ -190,6 +189,75 @@ func IterateMapThrough(mp [][]rune, lmt Coordinate, beams []LightBeam) ([]LightB
 	return beams, totalHistory
 }
 
+// Like a gorilla with a keyboard
+func FindLargest(mp [][]rune, lmt Coordinate) int {
+	top := 0
+
+	for x := 0; x <= lmt.X; x = x + 1 {
+		beams := []LightBeam{{
+			Velocity: Coordinate{0, 1},
+			Position: Coordinate{x, 0},
+		}}
+		_, totalHistory := IterateMapThrough(mp, lmt, beams)
+		cuml := 0
+		for _, hist := range totalHistory {
+			for range hist {
+				cuml = cuml + 1
+			}
+		}
+		if cuml > top {
+			top = cuml
+		}
+
+		beams = []LightBeam{{
+			Velocity: Coordinate{0, -1},
+			Position: Coordinate{x, lmt.Y},
+		}}
+		_, totalHistory = IterateMapThrough(mp, lmt, beams)
+		cuml = 0
+		for _, hist := range totalHistory {
+			for range hist {
+				cuml = cuml + 1
+			}
+		}
+		if cuml > top {
+			top = cuml
+		}
+	}
+	for y := 0; y <= lmt.Y; y = y + 1 {
+		beams := []LightBeam{{
+			Velocity: Coordinate{1, 0},
+			Position: Coordinate{0, y},
+		}}
+		_, totalHistory := IterateMapThrough(mp, lmt, beams)
+		cuml := 0
+		for _, hist := range totalHistory {
+			for range hist {
+				cuml = cuml + 1
+			}
+		}
+		if cuml > top {
+			top = cuml
+		}
+
+		beams = []LightBeam{{
+			Velocity: Coordinate{-1, 0},
+			Position: Coordinate{lmt.X, 0},
+		}}
+		_, totalHistory = IterateMapThrough(mp, lmt, beams)
+		cuml = 0
+		for _, hist := range totalHistory {
+			for range hist {
+				cuml = cuml + 1
+			}
+		}
+		if cuml > top {
+			top = cuml
+		}
+	}
+	return top
+}
+
 func main() {
 	buf, _ := os.ReadFile("data.txt")
 	input := string(buf)
@@ -207,4 +275,8 @@ func main() {
 	}
 
 	fmt.Printf("Result: %v\n", cuml)
+
+	top := FindLargest(res, lmt)
+
+	fmt.Printf("Result: %v\n", top)
 }
