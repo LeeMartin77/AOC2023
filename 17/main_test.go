@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var exampleMap string = `2413432311323
 3215453535623
@@ -34,10 +37,27 @@ func TestParseMap(t *testing.T) {
 	}
 }
 
+func DrawMap(mp [][]int, hist []Coordinate) {
+	for y, _ := range mp[0] {
+	xchr:
+		for x, _ := range mp {
+			for _, crd := range hist {
+				if crd.X == x && crd.Y == y {
+					fmt.Printf("#")
+					continue xchr
+				}
+			}
+			fmt.Printf(".")
+		}
+		fmt.Printf("\n")
+	}
+}
+
 func TestPathing(t *testing.T) {
 	res := ParseMap(exampleMap)
-	minHeatLoss := PathFromTo(res, Coordinate{0, 0}, Coordinate{12, 12}, 3)
+	minHeatLoss, history := PathFromTo(res, Coordinate{0, 0}, Coordinate{12, 12}, 3)
 	if minHeatLoss != 102 {
 		t.Errorf("Expected 102 got %v", minHeatLoss)
+		DrawMap(res, history)
 	}
 }

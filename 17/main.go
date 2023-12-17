@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -38,67 +39,78 @@ func (crd Coordinate) Key() string {
 	return fmt.Sprintf("%d:%d", crd.X, crd.Y)
 }
 
-func GetNeighbours(mp [][]int, cord Coordinate) []PriorityCord {
+func GetPossibleMoves(mp [][]int, cord Coordinate, fromMap map[string]Coordinate, maxStraight int) []PriorityCord {
 	neighbours := []PriorityCord{}
 	limitX := len(mp) - 1
 	limitY := len(mp[0]) - 1
 	if cord.X > 0 {
-		neighbours = append(neighbours, PriorityCord{
+		new := PriorityCord{
 			Priority: mp[cord.X-1][cord.Y],
 			Position: Coordinate{
 				X: cord.X - 1,
 				Y: cord.Y,
-			}})
+			}}
+		if !ExceedsMaxStraight(new.Position, cord, fromMap, maxStraight) {
+			neighbours = append(neighbours, new)
+		}
 	}
 	if cord.Y > 0 {
-		neighbours = append(neighbours, PriorityCord{
+		new := PriorityCord{
 			Priority: mp[cord.X][cord.Y-1],
 			Position: Coordinate{
 				X: cord.X,
 				Y: cord.Y - 1,
-			}})
+			}}
+		if !ExceedsMaxStraight(new.Position, cord, fromMap, maxStraight) {
+			neighbours = append(neighbours, new)
+		}
 	}
 	if cord.X < limitX {
-		neighbours = append(neighbours, PriorityCord{
+		new := PriorityCord{
 			Priority: mp[cord.X+1][cord.Y],
 			Position: Coordinate{
 				X: cord.X + 1,
 				Y: cord.Y,
-			}})
+			}}
+		if !ExceedsMaxStraight(new.Position, cord, fromMap, maxStraight) {
+			neighbours = append(neighbours, new)
+		}
 	}
 	if cord.Y < limitY {
-		neighbours = append(neighbours, PriorityCord{
+		new := PriorityCord{
 			Priority: mp[cord.X][cord.Y+1],
 			Position: Coordinate{
 				X: cord.X,
 				Y: cord.Y + 1,
-			}})
+			}}
+		if !ExceedsMaxStraight(new.Position, cord, fromMap, maxStraight) {
+			neighbours = append(neighbours, new)
+		}
 	}
 	return neighbours
 }
 
 func ExceedsMaxStraight(next Coordinate, current Coordinate, fromMap map[string]Coordinate, maxStraight int) bool {
-	straightCount := 0
-	xOffset := 0
-	yOffset := 0
-	for xOffset == 0 || yOffset == 0 {
-		xOffset = xOffset + (next.X - current.X)
-		yOffset = yOffset + (next.Y - current.Y)
-		next = current
-		newCur, ok := fromMap[current.Key()]
-		if !ok {
-			break
-		}
-		current = newCur
-		straightCount = straightCount + 1
-		if maxStraight+1 > straightCount {
-			break
-		}
+	previous := []Coordinate{}
+	prev, ok := fromMap[current.Key()]
+	for ok && len(previous) < maxStraight+1 {
+		previous = append(previous, prev)
+		prev, ok = fromMap[prev.Key()]
 	}
-	return maxStraight+1 > straightCount
+
+	if len(previous) < maxStraight {
+		return false
+	}
+
+	fewMovesAgo := previous[2]
+
+	yStraight := current.X == fewMovesAgo.X && (math.Abs(float64(next.Y-fewMovesAgo.Y))) >= float64(maxStraight-1)
+	xStraight := current.Y == fewMovesAgo.Y && (math.Abs(float64(next.X-fewMovesAgo.X))) >= float64(maxStraight-1)
+
+	return (yStraight && current.X == next.X) || (xStraight && current.Y == next.Y)
 }
 
-func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) int {
+func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) (int, []Coordinate) {
 	// Work out paths that are less than threshold based on rules
 	// we don't have heat from starting cord
 	frontier := []PriorityCord{}
@@ -122,11 +134,14 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) int
 		if current.Position.Equals(to) {
 			break
 		}
-		for _, neighbour := range GetNeighbours(mp, current.Position) {
+		for _, neighbour := range GetPossibleMoves(mp, current.Position, cameFrom, maxStraight) {
 			newCost := costSoFar[current.Position.Key()] + neighbour.Priority
 			// need a condition for neighbour not being fourth straight line
 			soFar, ok := costSoFar[neighbour.Position.Key()]
-			if !ok || newCost < soFar || !ExceedsMaxStraight(neighbour.Position, current.Position, cameFrom, maxStraight) {
+			if !ok || newCost < soFar {
+				// if !ExceedsMaxStraight(neighbour.Position, current.Position, cameFrom, maxStraight) {
+				// 	//
+				// }
 				costSoFar[neighbour.Position.Key()] = newCost
 				frontier = append(frontier, PriorityCord{
 					Priority: newCost,
@@ -137,7 +152,19 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) int
 		}
 	}
 
-	return current.Priority
+	history := []Coordinate{current.Position}
+
+	pos, ok := cameFrom[current.Position.Key()]
+	history = append(history, pos)
+
+	for ok {
+		pos, ok = cameFrom[pos.Key()]
+		if ok {
+			history = append(history, pos)
+		}
+	}
+
+	return current.Priority, history
 }
 
 func main() {
