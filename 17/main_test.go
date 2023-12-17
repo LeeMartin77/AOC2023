@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -34,22 +33,6 @@ func TestParseMap(t *testing.T) {
 
 	if res[8][10] != 6 {
 		t.Errorf("Expected 6 got %v", res[8][10])
-	}
-}
-
-func DrawMap(mp [][]int, hist []Coordinate) {
-	for y, _ := range mp[0] {
-	xchr:
-		for x, _ := range mp {
-			for _, crd := range hist {
-				if crd.X == x && crd.Y == y {
-					fmt.Printf("#")
-					continue xchr
-				}
-			}
-			fmt.Printf(".")
-		}
-		fmt.Printf("\n")
 	}
 }
 

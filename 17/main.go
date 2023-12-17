@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -10,6 +11,22 @@ import (
 
 type Coordinate struct {
 	X, Y int
+}
+
+func DrawMap(mp [][]int, hist []Coordinate) {
+	for y, _ := range mp[0] {
+	xchr:
+		for x, _ := range mp {
+			for _, crd := range hist {
+				if crd.X == x && crd.Y == y {
+					fmt.Printf("#")
+					continue xchr
+				}
+			}
+			fmt.Printf(".")
+		}
+		fmt.Printf("\n")
+	}
 }
 
 func ParseMap(input string) [][]int {
@@ -87,6 +104,10 @@ func GetPossibleMoves(mp [][]int, cord Coordinate, fromMap map[string]Coordinate
 			neighbours = append(neighbours, new)
 		}
 	}
+
+	sort.SliceStable(neighbours, func(i, j int) bool {
+		return neighbours[i].Priority < neighbours[j].Priority
+	})
 	return neighbours
 }
 
@@ -168,7 +189,13 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) (in
 }
 
 func main() {
-	// buf, _ := os.ReadFile("data.txt")
-	// stringput := string(buf)
-	// fmt.Printf("Result: %v", myTestFunction(stringput))
+	buf, _ := os.ReadFile("data.txt")
+	stringput := string(buf)
+
+	res := ParseMap(stringput)
+	bottom := len(res[0]) - 1
+	right := len(res) - 1
+	minHeatLoss, history := PathFromTo(res, Coordinate{0, 0}, Coordinate{right, bottom}, 3)
+	DrawMap(res, history)
+	fmt.Printf("Result: %v\n", minHeatLoss)
 }
