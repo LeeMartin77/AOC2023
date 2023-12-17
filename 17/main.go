@@ -143,6 +143,7 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) (in
 	//cameFrom[from.Key()] = nil
 	costSoFar[from.Key()] = 0
 
+	var winner PriorityCord
 	var current PriorityCord
 	for len(frontier) > 0 {
 		// get top priority
@@ -153,16 +154,13 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) (in
 		// pop
 		current, frontier = frontier[0], frontier[1:]
 		if current.Position.Equals(to) {
-			break
+			winner = current
+			continue
 		}
 		for _, neighbour := range GetPossibleMoves(mp, current.Position, cameFrom, maxStraight) {
 			newCost := costSoFar[current.Position.Key()] + neighbour.Priority
-			// need a condition for neighbour not being fourth straight line
 			soFar, ok := costSoFar[neighbour.Position.Key()]
 			if !ok || newCost < soFar {
-				// if !ExceedsMaxStraight(neighbour.Position, current.Position, cameFrom, maxStraight) {
-				// 	//
-				// }
 				costSoFar[neighbour.Position.Key()] = newCost
 				frontier = append(frontier, PriorityCord{
 					Priority: newCost,
@@ -173,9 +171,9 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) (in
 		}
 	}
 
-	history := []Coordinate{current.Position}
+	history := []Coordinate{winner.Position}
 
-	pos, ok := cameFrom[current.Position.Key()]
+	pos, ok := cameFrom[winner.Position.Key()]
 	history = append(history, pos)
 
 	for ok {
@@ -185,7 +183,7 @@ func PathFromTo(mp [][]int, from Coordinate, to Coordinate, maxStraight int) (in
 		}
 	}
 
-	return current.Priority, history
+	return winner.Priority, history
 }
 
 func main() {
