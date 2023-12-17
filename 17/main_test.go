@@ -34,20 +34,9 @@ func TestParseMap(t *testing.T) {
 	}
 }
 
-func TestGetDefault(t *testing.T) {
-
-	res := ParseMap(exampleMap)
-	exp := res[0][0] + res[0][1] + res[1][1] + res[1][2] + res[2][2]
-	act := GetDefault(res, Coordinate{0, 0}, Coordinate{2, 2})
-
-	if exp != act {
-		t.Errorf("Expected %v got %v", exp, act)
-	}
-}
-
 func TestPathing(t *testing.T) {
 	res := ParseMap(exampleMap)
-	minHeatLoss, _ := PathFromTo(res, Coordinate{0, 0}, Coordinate{12, 12}, 3)
+	minHeatLoss := PathFromTo(res, Coordinate{0, 0}, Coordinate{12, 12}, 3)
 	if minHeatLoss != 102 {
 		t.Errorf("Expected 102 got %v", minHeatLoss)
 	}
