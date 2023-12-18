@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 var example string = `R 6 (#70c710)
 D 5 (#0dc571)
@@ -41,11 +43,11 @@ var expectedFilled string = `#######
 .######
 `
 
-func DrawMap(trncs map[int]map[int]string, minX int, maxX int, minY int, maxY int) string {
+func DrawMap(trncs map[int64]map[int64]bool, minX int64, maxX int64, minY int64, maxY int64) string {
 	ret := ""
 	for y := minY; y <= maxY; y = y + 1 {
 		for x := minX; x <= maxX; x = x + 1 {
-			if trncs[x][y] == "" {
+			if !trncs[x][y] {
 				ret = ret + "."
 			} else {
 				ret = ret + "#"
@@ -72,7 +74,7 @@ func TestFillTrenches(t *testing.T) {
 
 	mapOfRes := DrawMap(filled, minX, maxX, minY, maxY)
 	if mapOfRes != expectedFilled {
-		t.Errorf("Expected:\n%s\n\ngot:\n%s", expectedTrenches, mapOfRes)
+		t.Errorf("Expected:\n%s\n\ngot:\n%s", expectedFilled, mapOfRes)
 	}
 }
 
@@ -84,5 +86,19 @@ func TestPartOne(t *testing.T) {
 	countFilled := filled.CountDug()
 	if countFilled != 62 {
 		t.Errorf("Expected:\n%d\n\ngot:\n%d", 62, countFilled)
+	}
+}
+
+func TestPartTwo(t *testing.T) {
+	res, trenchlength := DigTrenchesHex(example)
+
+	//filled := FillTrenches(res, "WOLOLOLOL")
+
+	countFilled := ShoelaceArea(res)
+
+	//fmt.Println(dugcount)
+
+	if countFilled+(trenchlength/2+1) != 952408144115 {
+		t.Errorf("Expected:\n%d\n\ngot:\n%d", 952408144115, countFilled)
 	}
 }
