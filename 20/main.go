@@ -151,6 +151,7 @@ func HitButton(network map[string]CommModule) (int, int) {
 	network["broadcaster"].ReceivePulse(false, "button")
 	highCount := 0
 	query := ""
+outer:
 	for len(queue) > 0 {
 		query, queue = queue[0], queue[1:]
 		if network[query] == nil {
@@ -162,6 +163,11 @@ func HitButton(network map[string]CommModule) (int, int) {
 				highCount = highCount + 1
 			} else {
 				lowCount = lowCount + 1
+			}
+
+			if !high && tgt == "rx" {
+				lowCount = -1
+				break outer
 			}
 			queue = append(queue, tgt)
 			if network[tgt] != nil {
@@ -184,4 +190,13 @@ func main() {
 		high = highAdd + high
 	}
 	fmt.Printf("Part One: %v\n", low*high)
+
+	cleanNtwrk := ParseCommsModules(input)
+	counter := 0
+	hold := 0
+	for hold != -1 {
+		hold, _ = HitButton(cleanNtwrk)
+	}
+	fmt.Printf("Part Two: %v\n", counter)
+
 }
