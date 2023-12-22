@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -10,7 +11,8 @@ type Coordinate struct {
 }
 
 type Brick struct {
-	Blocks []Coordinate
+	Blocks      []Coordinate
+	OriginIndex int
 }
 
 func ParseCoordinate(cords string) Coordinate {
@@ -69,10 +71,31 @@ func ParseBrick(input string) Brick {
 
 func ParseBricks(input string) []Brick {
 	bricks := []Brick{}
-	for _, ln := range strings.Split(input, "\n") {
-		bricks = append(bricks, ParseBrick(ln))
+	for i, ln := range strings.Split(input, "\n") {
+		brk := ParseBrick(ln)
+		brk.OriginIndex = i
+		bricks = append(bricks, brk)
 	}
 	return bricks
+}
+
+func OrderBricksOnZ(brcks []Brick) []Brick {
+	sort.SliceStable(brcks, func(i, j int) bool {
+		lowestZi := 0
+		lowestZj := 0
+		for _, crd := range brcks[i].Blocks {
+			if lowestZi < crd.Z {
+				lowestZi = crd.Z
+			}
+		}
+		for _, crd := range brcks[j].Blocks {
+			if lowestZj < crd.Z {
+				lowestZj = crd.Z
+			}
+		}
+		return lowestZi < lowestZj
+	})
+	return brcks
 }
 
 func main() {

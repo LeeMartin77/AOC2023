@@ -16,6 +16,13 @@ func TestParseBricks(t *testing.T) {
 	if len(res) != 7 {
 		t.Errorf("Expected 7 got %v", len(res))
 	}
+	i := 0
+	for _, brk := range res {
+		if brk.OriginIndex != i {
+			t.Errorf("Expected %v got %v", i, brk.OriginIndex)
+		}
+		i = i + 1
+	}
 }
 
 func TestParseBrick(t *testing.T) {
@@ -29,4 +36,31 @@ func TestParseBrick(t *testing.T) {
 			t.Errorf("Expected %v got %v", exp, res.Blocks[i])
 		}
 	}
+}
+
+func TestOrderingOnZ(t *testing.T) {
+	prsd := ParseBricks(example)
+	jumbled := []Brick{
+		prsd[2],
+		prsd[1],
+		prsd[0],
+		prsd[5],
+		prsd[4],
+		prsd[3],
+		prsd[6],
+	}
+	ordered := OrderBricksOnZ(jumbled)
+	i := 0
+	for _, brk := range ordered {
+		if brk.OriginIndex != i {
+			t.Errorf("Expected %v got %v", i, brk.OriginIndex)
+		}
+		i = i + 1
+	}
+}
+
+func TestExampleOne(t *testing.T) {
+	prsd := ParseBricks(example)
+	OrderBricksOnZ(prsd)
+	//dropped := DropOrderedBricks(ordered)
 }
