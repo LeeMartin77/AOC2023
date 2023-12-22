@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 // x, y, z
 var example string = `1,0,1~1,2,1
@@ -61,6 +63,10 @@ func TestOrderingOnZ(t *testing.T) {
 
 func TestExampleOne(t *testing.T) {
 	prsd := ParseBricks(example)
-	OrderBricksOnZ(prsd)
-	//dropped := DropOrderedBricks(ordered)
+	ordered := OrderBricksOnZ(prsd)
+	dropped := DropOrderedBricks(ordered)
+	count := CountDestroyableBricks(dropped)
+	if count != 5 {
+		t.Errorf("Expected 5 got %v", count)
+	}
 }
