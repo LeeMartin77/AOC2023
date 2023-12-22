@@ -163,6 +163,8 @@ allblks:
 			count = count + 1
 			continue allblks
 		}
+		countOtherSupported := 0
+	sup:
 		for _, sup := range supporting {
 			for _, other := range brcks {
 				if sup.OriginIndex == other.OriginIndex {
@@ -172,10 +174,14 @@ allblks:
 					continue
 				}
 				if other.Supports(sup) {
-					count = count + 1
-					continue allblks
+					countOtherSupported = countOtherSupported + 1
+					continue sup
 				}
 			}
+		}
+		if countOtherSupported == len(supporting) {
+			count = count + 1
+			continue allblks
 		}
 	}
 	return count
